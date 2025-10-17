@@ -1,12 +1,15 @@
 package hibernate.projects.Entity;
 
+import hibernate.projects.Enum.Suit;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "card")
 public abstract class Card {
 
     @Id
@@ -19,4 +22,6 @@ public abstract class Card {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "suit")
+    private Suit suit;
 }

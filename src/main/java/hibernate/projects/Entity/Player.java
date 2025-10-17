@@ -7,8 +7,13 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.Table;
 
 @Entity
+@Table(name = "player")
 public class Player {
 
     @Id
@@ -35,12 +40,16 @@ public class Player {
     @Column(name = "role")
     private Role role;
 
+    @OneToOne(mappedBy="weapon_card")
     @Column(name = "weapon")
     private WeaponCard weapon;
 
-    @Column(name = "equipments")
+    @ManyToOne
+    @JoinColumn(name = "equipment_card")
     private List<EquipmentCard> equipments;
 
+    @ManyToOne
+    @JoinColumn(name = "equipment_card")
     @Column(name = "cards_use")
     private List<UseCard> uses;
 
