@@ -1,16 +1,16 @@
-package hibernate.projects;
+package hibernate.projects.Entity;
 
 import java.util.List;
 
+import hibernate.projects.Enum.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
 
-
 @Entity
-public class Character {
+public class Player {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -19,16 +19,30 @@ public class Character {
     @Column(name = "name")
     private String name;
 
+    @Column(name = "current_life")
+    private int currentLife;
+
+    @Column(name = "max_life")
+    private int maxLife;
+
+    @Column(name = "def_distance_modifier")
+    private int defDistanceModifier;
+
+    @Column(name = "off_distance_modifier")
+    private int offDistanceModifier;
+
+    /** Relaciones */
+
     @Column(name = "role")
     private Role role;
 
     @Column(name = "weapon")
-    private String weapon;
+    private WeaponCard weapon;
 
     @Column(name = "equipments")
-    private List<String> equipments;
+    private List<EquipmentCard> equipments;
 
     @Column(name = "cards_use")
-    private List<String> cardsUse;
+    private List<UseCard> uses;
 
 }
