@@ -2,12 +2,11 @@ package hibernate.projects.Entity;
 
 import java.util.List;
 
-import hibernate.projects.Enum.Role;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
 import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
 @Entity
 public class Player {

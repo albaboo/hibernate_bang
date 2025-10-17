@@ -1,5 +1,5 @@
 package hibernate.projects.Enum;
 
-public enum Role {
+public enum TypeRole {
     SHERIFF, RENEGADE, MALFACTOR, ASSISTANT
 }
