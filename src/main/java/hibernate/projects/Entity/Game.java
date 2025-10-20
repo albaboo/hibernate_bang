@@ -8,6 +8,9 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -29,13 +32,24 @@ public class Game {
 
   /** Relaciones */
 
-  @Column(name = "players")
-  private List<Player> players;
+  @ManyToMany(mappedBy = "games")
+  private Set<Player> players;
 
-  @Column(name = "playing_cards")
-  private List<Card> playingCards;
 
-  @Column(name = "discared_cards")
-  private List<Card> discaredCards;
+    @ManyToMany
+    @JoinTable(
+        name = "game_playing_cards",
+        joinColumns = @JoinColumn(name = "game_id"),
+        inverseJoinColumns = @JoinColumn(name = "card_id")
+    )
+    private List<Card> playingCards;
+
+    @ManyToMany
+    @JoinTable(
+        name = "game_discarded_cards",
+        joinColumns = @JoinColumn(name = "game_id"),
+        inverseJoinColumns = @JoinColumn(name = "card_id")
+    )
+    private List<Card> discardedCards;
 
 }

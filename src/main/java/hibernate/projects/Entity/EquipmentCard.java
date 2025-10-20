@@ -3,6 +3,8 @@ package hibernate.projects.Entity;
 import hibernate.projects.Enum.TypeEquipment;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -14,4 +16,8 @@ public class EquipmentCard extends Card {
 
     @Column(name = "distance_modifier")
     private int distanceModifier;
+
+    @ManyToOne
+    @JoinColumn(name = "player_id")
+    private Player player;
 }
