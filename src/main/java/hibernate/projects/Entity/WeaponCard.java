@@ -15,5 +15,5 @@ public class WeaponCard extends Card {
     /** Relacions */
 
     @OneToOne(mappedBy = "weapon")
-    private Player player;
+    private Player equippedPlayer;
 }
