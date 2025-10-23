@@ -12,36 +12,19 @@ import jakarta.persistence.PersistenceException;
 
 public class Main {
 
-    private static SessionFactory sessionFactory;
+	private static EntityManagerFactory entityManagerFactory;
 
-    public static SessionFactory getSessionFactory() {
-        try {
-            if (sessionFactory == null) {
-                sessionFactory = new Configuration().configure("hibernate.cfg.xml").buildSessionFactory();
-            }
-        } catch (HibernateException e) {
-            System.err.println("Error al construir la Session Factory " + e.getMessage());
-            throw new ExceptionInInitializerError(e);
-        }
-        return sessionFactory;
-    }
-
-    private static EntityManagerFactory entityManagerFactory;
-
-    public static EntityManagerFactory getEntityManagerFactory() {
-        try {
-            if (entityManagerFactory == null) {
-                entityManagerFactory = Persistence.createEntityManagerFactory("cineversePU"); // El nom s'ha de
-                                                                                              // correspondre amb el de
-                                                                                              // l'arxiu
-                                                                                              // persistence.xml.
-            }
-        } catch (PersistenceException e) {
-            System.err.println("Error al construir l'EntityManagerFactory: " + e.getMessage());
-            throw new ExceptionInInitializerError(e);
-        }
-        return entityManagerFactory;
-    }
+	public static EntityManagerFactory getEntityManagerFactory() {
+		try {
+			if (entityManagerFactory == null) {
+				entityManagerFactory = Persistence.createEntityManagerFactory("cineversePU"); //El nom s'ha de correspondre amb el de l'arxiu persistence.xml.
+			}
+		} catch (PersistenceException e) {
+			System.err.println("Error al construir l'EntityManagerFactory: " + e.getMessage());
+			throw new ExceptionInInitializerError(e);
+		}
+		return entityManagerFactory;
+	}
 
     public static void main(String[] args) {
         EntityManager entityManager = null;
