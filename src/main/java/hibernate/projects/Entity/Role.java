@@ -23,17 +23,18 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "type")
+    private TypeRole type;
+
     @Column(name = "objective")
-    private TypeRole objective;
+    private String objective;
+
+    /** Relaciones */
 
     @OneToMany(mappedBy = "role")
     private List<Player> players;
 
     @ManyToMany
-    @JoinTable(
-        name = "player_game",
-        joinColumns = @JoinColumn(name = "player_id"),
-        inverseJoinColumns = @JoinColumn(name = "game_id")
-    )
+    @JoinTable(name = "player_game", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "game_id"))
     private Set<Game> games;
 }

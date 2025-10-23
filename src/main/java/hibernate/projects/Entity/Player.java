@@ -40,16 +40,17 @@ public class Player {
     /** Relaciones */
 
     @ManyToOne
-    @JoinColumn(name = "role_id") 
+    @JoinColumn(name = "role_id")
     private Role role;
 
-    @OneToOne(mappedBy="player")
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "weapon_id", referencedColumnName = "id")
     private WeaponCard weapon;
 
-    @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "equippedPlayer", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EquipmentCard.class)
     private List<EquipmentCard> equipments;
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<UseCard> uses;
+    private List<Card> hand;
 
 }

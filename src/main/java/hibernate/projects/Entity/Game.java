@@ -2,6 +2,7 @@ package hibernate.projects.Entity;
 
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -17,39 +18,30 @@ import jakarta.persistence.Table;
 @Table(name = "game")
 public class Game {
 
-  @Id
-  @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-  @Column(name = "status")
-  private String status;
+    @Column(name = "status")
+    private String status;
 
-  @Column(name = "turn")
-  private int turn;
+    @Column(name = "turn")
+    private int turn;
 
-  @Column(name = "start_date")
-  private Date startDate;
+    @Column(name = "start_date")
+    private Date startDate;
 
-  /** Relaciones */
+    /** Relaciones */
 
-  @ManyToMany(mappedBy = "games")
-  private Set<Player> players;
-
+    @ManyToMany(mappedBy = "games")
+    private Set<Player> players;
 
     @ManyToMany
-    @JoinTable(
-        name = "game_playing_cards",
-        joinColumns = @JoinColumn(name = "game_id"),
-        inverseJoinColumns = @JoinColumn(name = "card_id")
-    )
+    @JoinTable(name = "game_playing_cards", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
     private List<Card> playingCards;
 
     @ManyToMany
-    @JoinTable(
-        name = "game_discarded_cards",
-        joinColumns = @JoinColumn(name = "game_id"),
-        inverseJoinColumns = @JoinColumn(name = "card_id")
-    )
+    @JoinTable(name = "game_discarded_cards", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
     private List<Card> discardedCards;
 
 }

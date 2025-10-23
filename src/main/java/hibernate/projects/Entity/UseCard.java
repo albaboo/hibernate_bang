@@ -11,4 +11,7 @@ public class UseCard extends Card {
 
     @Column(name = "type")
     private TypeEquipment type;
+
+    /** Relaciones */
+
 }

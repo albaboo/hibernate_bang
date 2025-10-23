@@ -1,14 +1,12 @@
 package hibernate.projects.Entity;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "weapon_card")
+@Table(name = "weapon")
 public class WeaponCard extends Card {
 
     @Column(name = "distance")
@@ -16,7 +14,6 @@ public class WeaponCard extends Card {
 
     /** Relacions */
 
-	@OneToOne(cascade = CascadeType.ALL)
-	@JoinColumn(name="player_id")
-    private WeaponCard weapon;
+    @OneToOne(mappedBy = "weapon")
+    private Player player;
 }

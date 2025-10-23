@@ -17,7 +17,9 @@ public class EquipmentCard extends Card {
     @Column(name = "distance_modifier")
     private int distanceModifier;
 
+    /** Relaciones */
+
     @ManyToOne
-    @JoinColumn(name = "player_id")
-    private Player player;
+    @JoinColumn(name = "equipped_player_id")
+    private Player equippedPlayer;
 }
