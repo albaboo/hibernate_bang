@@ -23,41 +23,46 @@ public class Player {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    public int id;
 
     @Column(name = "name")
-    private String name;
+    public String name;
 
     @Column(name = "current_life")
-    private int currentLife;
+    public int currentLife;
 
     @Column(name = "max_life")
-    private int maxLife;
+    public int maxLife;
 
     @Column(name = "def_distance_modifier")
-    private int defDistanceModifier;
+    public int defDistanceModifier;
 
     @Column(name = "off_distance_modifier")
-    private int offDistanceModifier;
+    public int offDistanceModifier;
 
     /** Relaciones */
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    private Role role;
+    public Role role;
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "weapon_id", referencedColumnName = "id")
-    private WeaponCard weapon;
+    public WeaponCard weapon;
 
     @OneToMany(mappedBy = "equippedPlayer", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EquipmentCard.class)
-    private List<EquipmentCard> equipments;
+    public List<EquipmentCard> equipments;
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Card> hand;
+    public List<Card> hand;
 
     @ManyToMany
     @JoinTable(name = "player_game", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "game_id"))
-    private Set<Game> games;
+    public Set<Game> games;
+
+    @ManyToMany
+    @JoinTable(name = "distance_players", joinColumns = @JoinColumn(name = "player1_id"), inverseJoinColumns = @JoinColumn(name = "player2_id"))
+    public List<Player> distance;
+
 
 }

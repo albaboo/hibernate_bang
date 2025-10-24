@@ -20,28 +20,28 @@ public class Game {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    public int id;
 
-    @Column(name = "status")
-    private String status;
+    @Column(name = "status", columnDefinition = "VARCHAR(255) DEFAULT 'Start'")
+    public String status = "Start";
 
-    @Column(name = "turn")
-    private int turn;
+    @Column(name = "turn", nullable = false, columnDefinition = "INT DEFAULT 0")
+    public int turn = 0;
 
-    @Column(name = "start_date")
-    private Date startDate;
+    @Column(name = "start_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    public Date startDate = new Date();
 
     /** Relaciones */
 
     @ManyToMany(mappedBy = "games")
-    private Set<Player> players;
+    public Set<Player> players;
 
     @ManyToMany
     @JoinTable(name = "game_playing_cards", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
-    private List<Card> playingCards;
+    public List<Card> playingCards;
 
     @ManyToMany
     @JoinTable(name = "game_discarded_cards", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
-    private List<Card> discardedCards;
+    public List<Card> discardedCards;
 
 }
