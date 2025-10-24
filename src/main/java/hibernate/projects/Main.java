@@ -38,12 +38,12 @@ public class Main {
 
             boolean playing = true;
             while (playing) {
-                System.out.println("\n===== MENÚ PRINCIPAL =====");
+                System.out.println("\n========== MENÚ PRINCIPAL ==========");
                 System.out.println("\t1 - Jugar");
                 System.out.println("\t2 - Listar jugadores");
                 System.out.println("\t3 - Añadir jugador");
                 System.out.println("\t4 - Salir");
-                System.out.println("==========================");
+                System.out.println("====================================");
                 System.out.print("\nElige una número: ");
                 int option = in.nextInt();
                 switch (option) {
@@ -100,12 +100,12 @@ public class Main {
         boolean building = true;
         List<Player> players = new ArrayList<Player>();
         while (building) {
-            System.out.println("\n===== MENÚ DE PREPARACIÓN =====");
+            System.out.println("\n==================== MENÚ DE PREPARACIÓN ====================");
             System.out.println("\t1 - Añadir jugador a la partida");
             System.out.println("\t2 - Quitar jugador de la partida");
             if (players.size() > 1)
                 System.out.println("\t3 - Continuar");
-            System.out.println("=================================");
+            System.out.println("=============================================================");
             System.out.print("\nElige una número: ");
             int option = in.nextInt();
             switch (option) {
