@@ -1,9 +1,12 @@
 package hibernate.projects.Entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import hibernate.projects.Enum.TypeRole;
 import jakarta.persistence.Column;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -17,17 +20,18 @@ public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    public int id;
 
     @Column(name = "type")
-    private TypeRole type;
+    @Enumerated(EnumType.STRING)
+    public TypeRole type;
 
     @Column(name = "objective")
-    private String objective;
+    public String objective;
 
     /** Relaciones */
 
     @OneToMany(mappedBy = "role")
-    private List<Player> players;
+    public List<Player> players = new ArrayList<Player>();
 
 }

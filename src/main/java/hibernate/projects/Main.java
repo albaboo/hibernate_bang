@@ -7,6 +7,8 @@ import java.util.Set;
 
 import hibernate.projects.Entity.Game;
 import hibernate.projects.Entity.Player;
+import hibernate.projects.Entity.Role;
+import hibernate.projects.Enum.TypeRole;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -31,12 +33,40 @@ public class Main {
         return emFactory;
     }
 
+    private static void addRoles(EntityManager em, EntityTransaction transaction) {
+        try {
+            transaction = em.getTransaction();
+            transaction.begin();
+
+            for (TypeRole type : TypeRole.values()) {
+                Long count = em.createQuery("SELECT COUNT(r) FROM Role r WHERE r.type = :type", Long.class)
+                        .setParameter("type", type)
+                        .getSingleResult();
+                if (count == 0) {
+                    Role role = new Role();
+                    role.type = type;
+                    role.objective = type.objective;
+                    em.persist(role);
+                }
+            }
+            em.flush();
+            transaction.commit();
+        } catch (PersistenceException e) {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+            System.err.println("\u001B[31mError comprobando roles: " + e.getMessage() + "\u001B[0m");
+        }
+    }
+
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         EntityManager em = null;
         try {
             em = getEntityManagerFactory().createEntityManager();
             EntityTransaction transaction = em.getTransaction();
+
+            // Ensure role records for all enum values exist
+            addRoles(em, transaction);
 
             boolean playing = true;
             while (playing) {
