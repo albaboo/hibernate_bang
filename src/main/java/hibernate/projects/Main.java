@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Scanner;
 import java.util.Set;
+import java.util.Arrays;
+import java.util.List;
 
 import hibernate.projects.Entity.Game;
 import hibernate.projects.Entity.Player;
@@ -12,6 +14,7 @@ import hibernate.projects.Entity.WeaponCard;
 import hibernate.projects.Entity.EquipmentCard;
 import hibernate.projects.Entity.UseCard;
 import hibernate.projects.Enum.TypeRole;
+import hibernate.projects.Enum.Suit;
 import hibernate.projects.Enum.TypeEquipment;
 import hibernate.projects.Enum.TypeUse;
 import jakarta.persistence.EntityManager;
@@ -68,6 +71,70 @@ public class Main {
             transaction = em.getTransaction();
             transaction.begin();
 
+            final int NUMBER_CARDS = 80;
+
+            Long total = em.createQuery("SELECT COUNT(c) FROM Card c", Long.class).getSingleResult();
+            Long existing = total != null ? total : 0;
+
+            Suit[] suits = Suit.values();
+            int suitIndex = 0;
+
+            Long coltCount = em.createQuery("SELECT COUNT(w) FROM WeaponCard w WHERE w.name = :name", Long.class)
+                    .setParameter("name", "Colt")
+                    .getSingleResult();
+            if (coltCount == 0) {
+                WeaponCard colt = new WeaponCard();
+                colt.name = "Colt";
+                colt.description = "Arma predeterminada";
+                colt.distance = 1;
+                colt.suit = suits[suitIndex % suits.length];
+                suitIndex++;
+                em.persist(colt);
+                existing++;
+            }
+
+            for (TypeEquipment type : TypeEquipment.values()) {
+                Long totalEquipment = em
+                        .createQuery("SELECT COUNT(e) FROM EquipmentCard e WHERE e.type = :type", Long.class)
+                        .setParameter("type", type)
+                        .getSingleResult();
+                if (totalEquipment == 0) {
+                    EquipmentCard equipmentCard = new EquipmentCard();
+                    equipmentCard.name = type.name();
+                    equipmentCard.description = type.name();
+                    equipmentCard.type = type;
+                    if (type == TypeEquipment.HORSE || type == TypeEquipment.TELESCOPIC_SIGHT)
+                        equipmentCard.distanceModifier = 1;
+                    else
+                        equipmentCard.distanceModifier = 0;
+
+                    equipmentCard.suit = suits[suitIndex % suits.length];
+                    suitIndex++;
+                    em.persist(equipmentCard);
+                    existing++;
+                }
+            }
+
+            if (existing < NUMBER_CARDS) {
+                Long missing = NUMBER_CARDS - existing;
+                List<TypeUse> uses = Arrays.asList(TypeUse.values());
+                int useCount = uses.size();
+                int created = 0;
+                int index = 0;
+                while (created < missing) {
+                    TypeUse type = uses.get(index % useCount);
+                    UseCard useCard = new UseCard();
+                    useCard.name = type.name();
+                    useCard.description = type.name();
+                    useCard.type = type;
+                    em.persist(useCard);
+                    	
+                    useCard.suit = suits[suitIndex % suits.length];
+                    suitIndex++;
+                    created++;
+                    index++;
+                }
+            }
 
             em.flush();
             transaction.commit();
