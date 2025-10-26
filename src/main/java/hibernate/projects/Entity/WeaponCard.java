@@ -10,10 +10,10 @@ import jakarta.persistence.Table;
 public class WeaponCard extends Card {
 
     @Column(name = "distance")
-    private int distance;
+    public int distance;
 
     /** Relacions */
 
     @OneToOne(mappedBy = "weapon")
-    private Player equippedPlayer;
+    public Player equippedPlayer;
 }

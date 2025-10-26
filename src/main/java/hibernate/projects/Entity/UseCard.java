@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 public class UseCard extends Card {
 
     @Column(name = "type")
-    private TypeUse type;
+    public TypeUse type;
 
     /** Relaciones */
 

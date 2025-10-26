@@ -8,7 +8,12 @@ import java.util.Set;
 import hibernate.projects.Entity.Game;
 import hibernate.projects.Entity.Player;
 import hibernate.projects.Entity.Role;
+import hibernate.projects.Entity.WeaponCard;
+import hibernate.projects.Entity.EquipmentCard;
+import hibernate.projects.Entity.UseCard;
 import hibernate.projects.Enum.TypeRole;
+import hibernate.projects.Enum.TypeEquipment;
+import hibernate.projects.Enum.TypeUse;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -58,6 +63,21 @@ public class Main {
         }
     }
 
+    private static void checkCards(EntityManager em, EntityTransaction transaction) {
+        try {
+            transaction = em.getTransaction();
+            transaction.begin();
+
+
+            em.flush();
+            transaction.commit();
+        } catch (PersistenceException e) {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+            System.err.println("\u001B[31mError comprobando cartas: " + e.getMessage() + "\u001B[0m");
+        }
+    }
+
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         EntityManager em = null;
@@ -65,8 +85,8 @@ public class Main {
             em = getEntityManagerFactory().createEntityManager();
             EntityTransaction transaction = em.getTransaction();
 
-            // Ensure role records for all enum values exist
             checkRoles(em, transaction);
+            checkCards(em, transaction);
 
             boolean playing = true;
             while (playing) {

@@ -12,14 +12,14 @@ import jakarta.persistence.Table;
 public class EquipmentCard extends Card {
 
     @Column(name = "type")
-    private TypeEquipment type;
+    public TypeEquipment type;
 
     @Column(name = "distance_modifier")
-    private int distanceModifier;
+    public int distanceModifier;
 
     /** Relaciones */
 
     @ManyToOne
     @JoinColumn(name = "equipped_player_id")
-    private Player equippedPlayer;
+    public Player equippedPlayer;
 }

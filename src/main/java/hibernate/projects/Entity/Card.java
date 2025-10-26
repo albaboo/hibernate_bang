@@ -24,28 +24,28 @@ public abstract class Card {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    public int id;
 
     @Column(name = "name")
-    private String name;
+    public String name;
 
     @Column(name = "description")
-    private String description;
+    public String description;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "suit")
-    private Suit suit;
+    public Suit suit;
 
     /** Relaciones */
 
     @ManyToOne
     @JoinColumn(name = "player_id")
-    private Player player;
+    public Player player;
 
     @ManyToMany(mappedBy = "playingCards")
-    private List<Game> gamesPlaying;
+    public List<Game> gamesPlaying;
 
     @ManyToMany(mappedBy = "discardedCards")
-    private List<Game> gamesDiscarded;
+    public List<Game> gamesDiscarded;
 
 }
