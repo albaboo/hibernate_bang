@@ -101,7 +101,7 @@ public class Main {
                 if (totalEquipment == 0) {
                     EquipmentCard equipmentCard = new EquipmentCard();
                     equipmentCard.name = type.name();
-                    equipmentCard.description = type.name();
+                    equipmentCard.description = type.description;
                     equipmentCard.type = type;
                     if (type == TypeEquipment.HORSE || type == TypeEquipment.TELESCOPIC_SIGHT)
                         equipmentCard.distanceModifier = 1;
@@ -125,7 +125,7 @@ public class Main {
                     TypeUse type = uses.get(index % useCount);
                     UseCard useCard = new UseCard();
                     useCard.name = type.name();
-                    useCard.description = type.name();
+                    useCard.description = type.description;
                     useCard.type = type;
                     em.persist(useCard);
                     	
