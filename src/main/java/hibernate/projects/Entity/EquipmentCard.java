@@ -3,6 +3,8 @@ package hibernate.projects.Entity;
 import hibernate.projects.Enum.TypeEquipment;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
@@ -11,6 +13,7 @@ import jakarta.persistence.Table;
 @Table(name = "equipment_card")
 public class EquipmentCard extends Card {
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "type")
     public TypeEquipment type;
 

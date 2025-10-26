@@ -6,7 +6,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "weapon")
+@Table(name = "weapon_card")
 public class WeaponCard extends Card {
 
     @Column(name = "distance")

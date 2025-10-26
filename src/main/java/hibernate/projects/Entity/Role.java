@@ -22,8 +22,8 @@ public class Role {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     public int id;
 
-    @Column(name = "type")
     @Enumerated(EnumType.STRING)
+    @Column(name = "type")
     public TypeRole type;
 
     @Column(name = "objective")
