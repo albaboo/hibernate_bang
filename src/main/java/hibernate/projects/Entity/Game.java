@@ -32,6 +32,9 @@ public class Game {
     @Column(name = "start_date", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     public Date startDate = new Date();
 
+    @Column(name = "active", nullable = false, columnDefinition = "TINYINT(1) DEFAULT 1")
+    public boolean active = true;
+
     /** Relaciones */
 
     @ManyToMany(mappedBy = "games")
