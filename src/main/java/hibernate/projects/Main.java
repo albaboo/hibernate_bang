@@ -33,7 +33,7 @@ public class Main {
         return emFactory;
     }
 
-    private static void addRoles(EntityManager em, EntityTransaction transaction) {
+    private static void checkRoles(EntityManager em, EntityTransaction transaction) {
         try {
             transaction = em.getTransaction();
             transaction.begin();
@@ -66,7 +66,7 @@ public class Main {
             EntityTransaction transaction = em.getTransaction();
 
             // Ensure role records for all enum values exist
-            addRoles(em, transaction);
+            checkRoles(em, transaction);
 
             boolean playing = true;
             while (playing) {
