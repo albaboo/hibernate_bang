@@ -1,5 +1,6 @@
 package hibernate.projects.Entity;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -58,7 +59,7 @@ public class Player {
 
     @ManyToMany
     @JoinTable(name = "player_game", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "game_id"))
-    public Set<Game> games;
+    public Set<Game> games = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "distance_players", joinColumns = @JoinColumn(name = "player1_id"), inverseJoinColumns = @JoinColumn(name = "player2_id"))

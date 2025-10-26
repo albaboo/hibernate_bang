@@ -1,6 +1,6 @@
 package hibernate.projects.Entity;
 
-import hibernate.projects.Enum.TypeEquipment;
+import hibernate.projects.Enum.TypeUse;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 public class UseCard extends Card {
 
     @Column(name = "type")
-    private TypeEquipment type;
+    private TypeUse type;
 
     /** Relaciones */
 

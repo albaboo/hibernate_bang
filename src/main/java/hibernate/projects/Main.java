@@ -1,9 +1,9 @@
 package hibernate.projects;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Scanner;
+import java.util.Set;
 
 import hibernate.projects.Entity.Game;
 import hibernate.projects.Entity.Player;
@@ -16,6 +16,8 @@ import jakarta.persistence.PersistenceException;
 public class Main {
 
     private static EntityManagerFactory emFactory;
+
+    private static Game game;
 
     public static EntityManagerFactory getEntityManagerFactory() {
         try {
@@ -48,14 +50,21 @@ public class Main {
                 int option = in.nextInt();
                 switch (option) {
                     case 1:
-                        play(in, em, transaction);
+                        if (selectAll(em).size() > 1)
+                            play(in, em, transaction);
+                        else
+                            System.err.println("\n\u001B[31mNo hay jugadores suficientes registrados\u001B[0m");
                         break;
 
                     case 2:
-                        showPlayers(em, transaction);
+                        if (selectAll(em).size() > 0)
+                            showPlayers(em);
+                        else
+                            System.err.println("\n\u001B[31mNo hay jugadores suficientes registrados\u001B[0m");
+                        break;
 
                     case 3:
-                        addPlayer();
+                        addPlayer(em, transaction, in);
                         break;
 
                     case 4:
@@ -70,7 +79,7 @@ public class Main {
             System.out.println("Closing...");
 
         } catch (Exception e) {
-            System.out.println("Error durant l'execució del programa: " + e.getMessage());
+            System.err.println("\n\u001B[31mError durant l'execució del programa: " + e.getMessage() + "\u001B[0m");
         } finally {
             in.close();
 
@@ -84,87 +93,172 @@ public class Main {
     }
 
     private static void play(Scanner in, EntityManager em, EntityTransaction transaction) {
-        transaction = em.getTransaction();
-        transaction.begin();
+        game = new Game();
+        game.players = new HashSet<>();
+        boolean building = true;
+
         try {
-            Game game = new Game();
+            transaction = em.getTransaction();
+            transaction.begin();
+
             game.startDate = new Date();
-            em.persist(game); // L'INSERT es fa amb PERSIST
+            em.persist(game);
+            em.flush();
+
+            while (building) {
+                System.out.println("\n==================== MENÚ DE PREPARACIÓN ====================");
+                System.out.println("\t1 - Añadir jugador a la partida");
+                if (game.players.size() > 0)
+                    System.out.println("\t2 - Quitar jugador de la partida");
+                if (game.players.size() > 1)
+                    System.out.println("\t3 - Continuar");
+                System.out.println("=============================================================");
+                System.out.print("\nElige una número: ");
+                int option = in.nextInt();
+                switch (option) {
+                    case 1:
+                        addPlayerToGame(em, in, transaction);
+                        break;
+
+                    case 2:
+                        removePlayerToGame(em, in, transaction);
+                        break;
+
+                    case 3:
+                        if (game.players.size() > 1)
+                            building = false;
+                        break;
+                    default:
+                        break;
+                }
+            }
+
             transaction.commit();
         } catch (PersistenceException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
 
-            System.err.println("Error durant la inserció de dades: " + e.getMessage());
-        }
-        boolean building = true;
-        List<Player> players = new ArrayList<Player>();
-        while (building) {
-            System.out.println("\n==================== MENÚ DE PREPARACIÓN ====================");
-            System.out.println("\t1 - Añadir jugador a la partida");
-            System.out.println("\t2 - Quitar jugador de la partida");
-            if (players.size() > 1)
-                System.out.println("\t3 - Continuar");
-            System.out.println("=============================================================");
-            System.out.print("\nElige una número: ");
-            int option = in.nextInt();
-            switch (option) {
-                case 1:
-                    addPlayerToGame();
-                    break;
-
-                case 2:
-                    removePlayerToGame();
-                    break;
-
-                case 3:
-                    if (players.size() > 1)
-                        building = false;
-                    break;
-                default:
-                    break;
-            }
-
+            System.err.println("\n\u001B[31mError durant la inserció de dades:  " + e.getMessage() + "\u001B[0m");
         }
     }
 
-    private static void showPlayers(EntityManager em, EntityTransaction transaction) {
-        List<Player> players = new ArrayList<Player>();
+    private static void showPlayers(EntityManager em) {
+        Set<Player> players = new HashSet<Player>();
         try {
             players = selectAll(em);
-
+            System.out.println("\n==================== LISTA DE JUGADORES ====================");
             for (Player player : players) {
-                System.out.println(player.id + " - " + player.name);
+                System.out.println("\t" + player.id + " - " + player.name);
             }
-
+            System.out.println("============================================================");
         } catch (PersistenceException e) {
-            if (transaction != null && transaction.isActive())
-                transaction.rollback();
-
-            System.err.println("Error durant la recuperació de dades: " + e.getMessage());
+            System.err.println("\n\u001B[31mError durant la recuperació de dades: " + e.getMessage() + "\u001B[0m");
 
         }
     }
 
-    private static List<Player> selectAll(EntityManager em) {
-        EntityTransaction transaction = em.getTransaction();
-        transaction.begin();
-        // CreateQuery permet fer consultes amb JPQL (similar a HQL)
-        List<Player> players = em.createQuery("FROM player", Player.class).getResultList();
-        transaction.commit();
+    private static void showPlayersInGame(EntityManager em) {
+        try {
+            System.out.println("\n==================== LISTA DE JUGADORES ====================");
+            for (Player player : game.players) {
+                System.out.println("\t" + player.id + " - " + player.name);
+            }
+            System.out.println("============================================================");
+        } catch (PersistenceException e) {
+            System.err.println("\n\u001B[31mError durant la recuperació de dades: " + e.getMessage() + "\u001B[0m");
+
+        }
+    }
+
+    private static Set<Player> selectAll(EntityManager em) {
+        Set<Player> players = new HashSet<>(em.createQuery("FROM Player", Player.class).getResultList());
 
         return players;
     }
 
-    private static void addPlayer() {
+    private static void addPlayer(EntityManager em, EntityTransaction transaction, Scanner in) {
+        boolean creating = true;
+        in.nextLine();
+        while (creating) {
+            System.out.print("\nEscribe un nombre de jugador: ");
+            String name = in.nextLine();
+            if (name.length() > 0) {
+                Player newPlayer = new Player();
+                newPlayer.name = name;
+                try {
+                    transaction = em.getTransaction();
+                    transaction.begin();
+                    em.persist(newPlayer);
+                    transaction.commit();
+                    System.out.println("Añadido: " + newPlayer.name);
+                    creating = false;
+                } catch (PersistenceException e) {
+                    if (transaction != null && transaction.isActive())
+                        transaction.rollback();
+
+                    System.err
+                            .println("\n\u001B[31mError durant la inserció de dades:  " + e.getMessage() + "\u001B[0m");
+                }
+            }
+
+        }
 
     }
 
-    private static void addPlayerToGame() {
+    private static void addPlayerToGame(EntityManager em, Scanner in, EntityTransaction transaction) {
+        boolean selecting = true;
+        while (selecting) {
+            showPlayers(em);
+            System.out.println("\n\t0 - Volver atras");
+            System.out.print("\nSelecciona un número de jugador: ");
+            int option = in.nextInt();
+            if (option == 0)
+                selecting = false;
+            else {
+                Player selectedPlayer = em.find(Player.class, option);
+                if (selectedPlayer == null)
+                    System.err.println("\n\u001B[31mJugador no encontrado.\u001B[0m");
+                else if (game.players.contains(selectedPlayer))
+                    System.err.println("\n\u001B[31mJugador ya incluido en la partida.\u001B[0m");
+                else {
+                    selectedPlayer.games.add(game);
+                    game.players.add(selectedPlayer);
+
+                    System.out.println("Añadido: " + selectedPlayer.name);
+                    selecting = false;
+                }
+
+            }
+
+        }
 
     }
 
-    private static void removePlayerToGame() {
+    private static void removePlayerToGame(EntityManager em, Scanner in, EntityTransaction transaction) {
+        boolean selecting = true;
+        while (selecting) {
+            showPlayersInGame(em);
+            System.out.println("\n\t0 - Volver atras");
+            System.out.print("\nSelecciona un número de jugador: ");
+            int option = in.nextInt();
+            if (option == 0)
+                selecting = false;
+            else {
+                Player selectedPlayer = em.find(Player.class, option);
+                if (selectedPlayer == null)
+                    System.err.println("\n\u001B[31mJugador no encontrado.\u001B[0m");
+                else if (!game.players.contains(selectedPlayer))
+                    System.err.println("\n\u001B[31mJugador no incluido en la partida.\u001B[0m");
+                else {
+                    selectedPlayer.games.remove(game);
+                    game.players.remove(selectedPlayer);
 
+                    System.out.println("Eliminado: " + selectedPlayer.name);
+                    selecting = false;
+                }
+
+            }
+
+        }
     }
 }
