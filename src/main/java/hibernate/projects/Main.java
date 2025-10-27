@@ -260,6 +260,20 @@ public class Main {
     }
 
     private static void play(Scanner in, EntityManager em, EntityTransaction transaction) {
+        List<Role> roles = em.createQuery("FROM Role", Role.class).getResultList();
+        int index = 0;
+
+        transaction = em.getTransaction();
+        transaction.begin();
+
+        for (Player player : game.players) {
+            player.role = roles.get(index % roles.size());
+            em.persist(player);
+            index++;
+        }
+        em.flush();
+
+        transaction.commit();
 
     }
 
