@@ -128,7 +128,7 @@ public class Main {
                     useCard.description = type.description;
                     useCard.type = type;
                     em.persist(useCard);
-                    	
+
                     useCard.suit = suits[suitIndex % suits.length];
                     suitIndex++;
                     created++;
@@ -168,7 +168,7 @@ public class Main {
                 switch (option) {
                     case 1:
                         if (selectAll(em).size() > 1)
-                            play(in, em, transaction);
+                            startGame(in, em, transaction);
                         else
                             System.err.println("\n\u001B[31mNo hay jugadores suficientes registrados\u001B[0m");
                         break;
@@ -209,7 +209,7 @@ public class Main {
 
     }
 
-    private static void play(Scanner in, EntityManager em, EntityTransaction transaction) {
+    private static void startGame(Scanner in, EntityManager em, EntityTransaction transaction) {
         game = new Game();
         game.players = new HashSet<>();
         boolean building = true;
@@ -249,14 +249,18 @@ public class Main {
                         break;
                 }
             }
-
             transaction.commit();
+            play(in, em, transaction);
         } catch (PersistenceException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
 
             System.err.println("\n\u001B[31mError durant la inserció de dades:  " + e.getMessage() + "\u001B[0m");
         }
+    }
+
+    private static void play(Scanner in, EntityManager em, EntityTransaction transaction) {
+
     }
 
     private static void showPlayers(EntityManager em) {
