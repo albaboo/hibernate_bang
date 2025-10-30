@@ -239,14 +239,13 @@ public class Main {
 
             List<Role> roles = em.createQuery("FROM Role", Role.class).getResultList();
             int roleIndex = 0;
-            
+
             Suit[] suits = Suit.values();
             int suitIndex = 0;
 
             transaction = em.getTransaction();
             transaction.begin();
 
-            
             for (Player player : game.players) {
                 player.role = roles.get(roleIndex % roles.size());
                 WeaponCard colt = new WeaponCard();
@@ -276,7 +275,6 @@ public class Main {
     }
 
     private static void play(Scanner in, EntityManager em, EntityTransaction transaction) {
-
 
     }
 
