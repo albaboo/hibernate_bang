@@ -79,20 +79,6 @@ public class Main {
             Suit[] suits = Suit.values();
             int suitIndex = 0;
 
-            Long coltCount = em.createQuery("SELECT COUNT(w) FROM WeaponCard w WHERE w.name = :name", Long.class)
-                    .setParameter("name", "Colt")
-                    .getSingleResult();
-            if (coltCount == 0) {
-                WeaponCard colt = new WeaponCard();
-                colt.name = "Colt";
-                colt.description = "Arma predeterminada";
-                colt.distance = 1;
-                colt.suit = suits[suitIndex % suits.length];
-                suitIndex++;
-                em.persist(colt);
-                existing++;
-            }
-
             for (TypeEquipment type : TypeEquipment.values()) {
                 Long totalEquipment = em
                         .createQuery("SELECT COUNT(e) FROM EquipmentCard e WHERE e.type = :type", Long.class)
@@ -250,6 +236,36 @@ public class Main {
                 }
             }
             transaction.commit();
+
+            List<Role> roles = em.createQuery("FROM Role", Role.class).getResultList();
+            int roleIndex = 0;
+            
+            Suit[] suits = Suit.values();
+            int suitIndex = 0;
+
+            transaction = em.getTransaction();
+            transaction.begin();
+
+            
+            for (Player player : game.players) {
+                player.role = roles.get(roleIndex % roles.size());
+                WeaponCard colt = new WeaponCard();
+                colt.name = "Colt";
+                colt.description = "Arma predeterminada";
+                colt.distance = 1;
+                colt.suit = suits[suitIndex % suits.length];
+                colt.player = player;
+                player.weapon = colt;
+                suitIndex++;
+                em.persist(colt);
+                em.persist(player);
+                roleIndex++;
+            }
+
+            em.flush();
+
+            transaction.commit();
+
             play(in, em, transaction);
         } catch (PersistenceException e) {
             if (transaction != null && transaction.isActive())
@@ -260,20 +276,7 @@ public class Main {
     }
 
     private static void play(Scanner in, EntityManager em, EntityTransaction transaction) {
-        List<Role> roles = em.createQuery("FROM Role", Role.class).getResultList();
-        int index = 0;
 
-        transaction = em.getTransaction();
-        transaction.begin();
-
-        for (Player player : game.players) {
-            player.role = roles.get(index % roles.size());
-            em.persist(player);
-            index++;
-        }
-        em.flush();
-
-        transaction.commit();
 
     }
 
