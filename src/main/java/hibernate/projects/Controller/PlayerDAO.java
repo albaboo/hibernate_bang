@@ -4,7 +4,7 @@ import java.util.List;
 
 import hibernate.projects.Entity.Card;
 
-public class Player {
+public class PlayerDAO {
 
     public List<Card> showHand(int idPlayer) {
 
