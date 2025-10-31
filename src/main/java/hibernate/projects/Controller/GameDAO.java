@@ -116,7 +116,6 @@ public class GameDAO {
 
             transaction.commit();
 
-            // play(in, em, transaction);
         } catch (PersistenceException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();

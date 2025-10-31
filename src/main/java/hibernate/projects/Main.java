@@ -2,7 +2,9 @@ package hibernate.projects;
 
 import java.util.Scanner;
 
-import hibernate.projects.Controller.Base;
+import hibernate.projects.Controller.CardDAO;
+import hibernate.projects.Controller.PlayerDAO;
+import hibernate.projects.Controller.RoleDAO;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
 import jakarta.persistence.EntityTransaction;
@@ -32,8 +34,8 @@ public class Main {
             em = getEntityManagerFactory().createEntityManager();
             EntityTransaction transaction = em.getTransaction();
 
-            Base.checkRoles(em, transaction);
-            Base.checkCards(em, transaction);
+            RoleDAO.checkRoles(em, transaction);
+            CardDAO.checkCards(em, transaction);
 
             boolean playing = true;
             while (playing) {
@@ -47,21 +49,21 @@ public class Main {
                 int option = in.nextInt();
                 switch (option) {
                     case 1:
-                        if (Base.listPlayers(em).size() > 1)
+                        if (PlayerDAO.listPlayers(em).size() > 1)
                             hibernate.projects.Controller.GameDAO.startGame(in, em, transaction);
                         else
                             System.err.println("\n\u001B[31mNo hay jugadores suficientes registrados\u001B[0m");
                         break;
 
                     case 2:
-                        if (Base.listPlayers(em).size() > 0)
-                            Base.showPlayers(em);
+                        if (PlayerDAO.listPlayers(em).size() > 0)
+                            PlayerDAO.showPlayers(em);
                         else
                             System.err.println("\n\u001B[31mNo hay jugadores suficientes registrados\u001B[0m");
                         break;
 
                     case 3:
-                        Base.addPlayer(em, transaction, in);
+                        PlayerDAO.addPlayer(em, transaction, in);
                         break;
 
                     case 4:
