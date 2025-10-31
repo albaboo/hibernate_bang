@@ -13,7 +13,7 @@ import jakarta.persistence.PersistenceException;
 
 public class PlayerDAO {
 
-    public static Set<Player> listPlayers(EntityManager em) {
+    public static Set<Player> list(EntityManager em) {
 
         Set<Player> players = new HashSet<>(em.createQuery("FROM Player", Player.class).getResultList());
 
@@ -23,7 +23,7 @@ public class PlayerDAO {
     public static void showPlayers(EntityManager em) {
         Set<Player> players = new HashSet<Player>();
         try {
-            players = PlayerDAO.listPlayers(em);
+            players = PlayerDAO.list(em);
             System.out.println("\n==================== LISTA DE JUGADORES ====================");
             for (Player player : players) {
                 System.out.println("\t" + player.id + " - " + player.name);

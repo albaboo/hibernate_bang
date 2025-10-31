@@ -1,5 +1,6 @@
 package hibernate.projects.Entity;
 
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,10 +53,10 @@ public class Player {
     public WeaponCard weapon;
 
     @OneToMany(mappedBy = "equippedPlayer", cascade = CascadeType.ALL, orphanRemoval = true, targetEntity = EquipmentCard.class)
-    public List<EquipmentCard> equipments;
+    public Deque<EquipmentCard> equipments;
 
     @OneToMany(mappedBy = "player", cascade = CascadeType.ALL, orphanRemoval = true)
-    public List<Card> hand;
+    public Deque<Card> hand;
 
     @ManyToMany
     @JoinTable(name = "player_game", joinColumns = @JoinColumn(name = "player_id"), inverseJoinColumns = @JoinColumn(name = "game_id"))

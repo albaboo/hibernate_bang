@@ -2,7 +2,7 @@ package hibernate.projects.Controller;
 
 import java.util.Arrays;
 import java.util.List;
-
+import hibernate.projects.Entity.Card;
 import hibernate.projects.Entity.EquipmentCard;
 import hibernate.projects.Entity.UseCard;
 import hibernate.projects.Enum.Suit;
@@ -14,6 +14,27 @@ import jakarta.persistence.PersistenceException;
 
 public class CardDAO {
 
+    public static List<Card> list(EntityManager em) {
+
+        List<Card> cards = em.createQuery("FROM Card", Card.class).getResultList();
+
+        return cards;
+    }
+
+    public static List<Card> shuffle(EntityManager em) {
+
+        List<Card> cards = em.createQuery("SELECT c FROM Card c ORDER BY function('RAND')", Card.class).getResultList();
+
+        return cards;
+    }
+
+    public static List<Card> listByType(EntityManager em) {
+
+        List<Card> cards = em.createQuery("FROM Card", Card.class).getResultList();
+
+        return cards;
+    }
+
     public static void checkCards(EntityManager em, EntityTransaction transaction) {
         try {
             transaction = em.getTransaction();
@@ -22,40 +43,19 @@ public class CardDAO {
             final int NUMBER_CARDS = 80;
 
             Long total = em.createQuery("SELECT COUNT(c) FROM Card c", Long.class).getSingleResult();
+
             Long existing = total != null ? total : 0;
 
             Suit[] suits = Suit.values();
             int suitIndex = 0;
 
-            for (TypeEquipment type : TypeEquipment.values()) {
-                Long totalEquipment = em
-                        .createQuery("SELECT COUNT(e) FROM EquipmentCard e WHERE e.type = :type", Long.class)
-                        .setParameter("type", type)
-                        .getSingleResult();
-                if (totalEquipment == 0) {
-                    EquipmentCard equipmentCard = new EquipmentCard();
-                    equipmentCard.name = type.name();
-                    equipmentCard.description = type.description;
-                    equipmentCard.type = type;
-                    if (type == TypeEquipment.HORSE || type == TypeEquipment.TELESCOPIC_SIGHT)
-                        equipmentCard.distanceModifier = 1;
-                    else
-                        equipmentCard.distanceModifier = 0;
+            while (existing < NUMBER_CARDS) {
 
-                    equipmentCard.suit = suits[suitIndex % suits.length];
-                    suitIndex++;
-                    em.persist(equipmentCard);
-                    existing++;
-                }
-            }
-
-            if (existing < NUMBER_CARDS) {
-                Long missing = NUMBER_CARDS - existing;
                 List<TypeUse> uses = Arrays.asList(TypeUse.values());
                 int useCount = uses.size();
                 int created = 0;
                 int index = 0;
-                while (created < missing) {
+                while (created < 43 && existing < NUMBER_CARDS) {
                     TypeUse type = uses.get(index % useCount);
                     UseCard useCard = new UseCard();
                     useCard.name = type.name();
@@ -64,9 +64,33 @@ public class CardDAO {
                     em.persist(useCard);
 
                     useCard.suit = suits[suitIndex % suits.length];
-                    suitIndex++;
                     created++;
-                    index++;
+                    existing++;
+                    suitIndex++;
+                    if (created == 6 || created == 18)
+                        index++;
+                }
+
+                if (existing < NUMBER_CARDS) {
+                    for (int i = 0; i < 4 && existing < NUMBER_CARDS; i++) {
+                        for (TypeEquipment type : TypeEquipment.values()) {
+                            EquipmentCard equipmentCard = new EquipmentCard();
+                            equipmentCard.name = type.name();
+                            equipmentCard.description = type.description;
+                            equipmentCard.type = type;
+                            if (type == TypeEquipment.HORSE || type == TypeEquipment.TELESCOPIC_SIGHT)
+                                equipmentCard.distanceModifier = 1;
+                            else
+                                equipmentCard.distanceModifier = 0;
+
+                            equipmentCard.suit = suits[suitIndex % suits.length];
+                            em.persist(equipmentCard);
+
+                            suitIndex++;
+                            existing++;
+                        }
+                    }
+
                 }
             }
 

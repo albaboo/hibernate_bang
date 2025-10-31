@@ -1,6 +1,6 @@
 package hibernate.projects.Entity;
 
-import java.util.List;
+import java.util.Deque;
 
 import hibernate.projects.Enum.Suit;
 import jakarta.persistence.Column;
@@ -43,9 +43,9 @@ public abstract class Card {
     public Player player;
 
     @ManyToMany(mappedBy = "playingCards")
-    public List<Game> gamesPlaying;
+    public Deque<Game> gamesPlaying;
 
     @ManyToMany(mappedBy = "discardedCards")
-    public List<Game> gamesDiscarded;
+    public Deque<Game> gamesDiscarded;
 
 }

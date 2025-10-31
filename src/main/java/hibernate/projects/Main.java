@@ -49,14 +49,14 @@ public class Main {
                 int option = in.nextInt();
                 switch (option) {
                     case 1:
-                        if (PlayerDAO.listPlayers(em).size() > 1)
+                        if (PlayerDAO.list(em).size() > 1)
                             hibernate.projects.Controller.GameDAO.startGame(in, em, transaction);
                         else
                             System.err.println("\n\u001B[31mNo hay jugadores suficientes registrados\u001B[0m");
                         break;
 
                     case 2:
-                        if (PlayerDAO.listPlayers(em).size() > 0)
+                        if (PlayerDAO.list(em).size() > 0)
                             PlayerDAO.showPlayers(em);
                         else
                             System.err.println("\n\u001B[31mNo hay jugadores suficientes registrados\u001B[0m");

@@ -1,8 +1,8 @@
 package hibernate.projects.Entity;
 
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import jakarta.persistence.Column;
@@ -42,10 +42,10 @@ public class Game {
 
     @ManyToMany
     @JoinTable(name = "game_playing_cards", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
-    public List<Card> playingCards;
+    public Deque<Card> playingCards;
 
     @ManyToMany
     @JoinTable(name = "game_discarded_cards", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
-    public List<Card> discardedCards;
+    public Deque<Card> discardedCards;
 
 }

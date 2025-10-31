@@ -1,5 +1,7 @@
 package hibernate.projects.Controller;
 
+import java.util.List;
+
 import hibernate.projects.Entity.Role;
 import hibernate.projects.Enum.TypeRole;
 import jakarta.persistence.EntityManager;
@@ -7,6 +9,14 @@ import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
 
 public class RoleDAO {
+
+    public static List<Role> list(EntityManager em) {
+
+        List<Role> roles = em.createQuery("FROM Role", Role.class).getResultList();
+
+        return roles;
+    }
+
     public static void checkRoles(EntityManager em, EntityTransaction transaction) {
         try {
             transaction = em.getTransaction();

@@ -1,11 +1,14 @@
 package hibernate.projects.Controller;
 
+import java.util.ArrayDeque;
 import java.util.Date;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Set;
 
+import hibernate.projects.Entity.Card;
 import hibernate.projects.Entity.Game;
 import hibernate.projects.Entity.Player;
 import hibernate.projects.Entity.Role;
@@ -19,6 +22,7 @@ public class GameDAO {
 
     public static Set<Player> listPlayers(EntityManager em, int idGame) {
 
+        /** BLABLABLA */
         return null;
     }
 
@@ -88,11 +92,13 @@ public class GameDAO {
             }
             transaction.commit();
 
-            List<Role> roles = em.createQuery("FROM Role", Role.class).getResultList();
+            List<Role> roles = RoleDAO.list(em);
             int roleIndex = 0;
 
             Suit[] suits = Suit.values();
             int suitIndex = 0;
+
+            Deque<Card> cards = new ArrayDeque<>(CardDAO.shuffle(em));
 
             transaction = em.getTransaction();
             transaction.begin();
@@ -106,11 +112,20 @@ public class GameDAO {
                 colt.suit = suits[suitIndex % suits.length];
                 colt.player = player;
                 player.weapon = colt;
-                suitIndex++;
+                for (int i = 0; i < 4; i++) {
+                    player.hand.add(cards.pollFirst());
+                    
+                }
+                
                 em.persist(colt);
                 em.persist(player);
                 roleIndex++;
+                suitIndex++;
             }
+
+            game.playingCards = cards;
+
+            em.persist(game);
 
             em.flush();
 
