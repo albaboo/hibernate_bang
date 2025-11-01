@@ -30,12 +30,13 @@ public class Main {
     public static void main(String[] args) {
         Scanner in = new Scanner(System.in);
         EntityManager em = null;
+        EntityTransaction transaction = null;
         try {
             em = getEntityManagerFactory().createEntityManager();
-            EntityTransaction transaction = em.getTransaction();
+            transaction = em.getTransaction();
 
-            RoleDAO.checkRoles(em, transaction);
-            CardDAO.checkCards(em, transaction);
+            RoleDAO.checkRoles(em);
+            CardDAO.checkCards(em);
 
             boolean playing = true;
             while (playing) {
@@ -50,7 +51,7 @@ public class Main {
                 switch (option) {
                     case 1:
                         if (PlayerDAO.list(em).size() > 1)
-                            hibernate.projects.Controller.GameDAO.startGame(in, em, transaction);
+                            hibernate.projects.Controller.GameDAO.startGame(em, in);
                         else
                             System.err.println("\n\u001B[31mNo hay jugadores suficientes registrados\u001B[0m");
                         break;
@@ -63,7 +64,7 @@ public class Main {
                         break;
 
                     case 3:
-                        PlayerDAO.addPlayer(em, transaction, in);
+                        PlayerDAO.addPlayer(em, in);
                         break;
 
                     case 4:
@@ -78,6 +79,9 @@ public class Main {
             System.out.println("Closing...");
 
         } catch (Exception e) {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+
             System.err.println("\n\u001B[31mError durant l'execució del programa: " + e.getMessage() + "\u001B[0m");
         } finally {
             in.close();

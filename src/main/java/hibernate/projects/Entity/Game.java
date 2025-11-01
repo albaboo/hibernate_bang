@@ -1,5 +1,6 @@
 package hibernate.projects.Entity;
 
+import java.util.ArrayDeque;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashSet;
@@ -42,10 +43,10 @@ public class Game {
 
     @ManyToMany
     @JoinTable(name = "game_playing_cards", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
-    public Deque<Card> playingCards;
+    public Deque<Card> playingCards = new ArrayDeque<>();
 
     @ManyToMany
     @JoinTable(name = "game_discarded_cards", joinColumns = @JoinColumn(name = "game_id"), inverseJoinColumns = @JoinColumn(name = "card_id"))
-    public Deque<Card> discardedCards;
+    public Deque<Card> discardedCards = new ArrayDeque<>();
 
 }

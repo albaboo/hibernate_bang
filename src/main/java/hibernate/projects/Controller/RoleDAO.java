@@ -17,9 +17,9 @@ public class RoleDAO {
         return roles;
     }
 
-    public static void checkRoles(EntityManager em, EntityTransaction transaction) {
+    public static void checkRoles(EntityManager em) {
+        EntityTransaction transaction = em.getTransaction();
         try {
-            transaction = em.getTransaction();
             transaction.begin();
 
             for (TypeRole type : TypeRole.values()) {
@@ -39,6 +39,9 @@ public class RoleDAO {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
             System.err.println("\u001B[31mError comprobando roles: " + e.getMessage() + "\u001B[0m");
+        } finally {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
         }
     }
 }
