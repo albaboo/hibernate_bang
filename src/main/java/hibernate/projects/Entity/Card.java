@@ -1,5 +1,6 @@
 package hibernate.projects.Entity;
 
+import java.util.ArrayDeque;
 import java.util.Deque;
 
 import hibernate.projects.Enum.Suit;
@@ -43,9 +44,23 @@ public abstract class Card {
     public Player player;
 
     @ManyToMany(mappedBy = "playingCards")
-    public Deque<Game> gamesPlaying;
+    public Deque<Game> gamesPlaying  = new ArrayDeque<>();
 
     @ManyToMany(mappedBy = "discardedCards")
-    public Deque<Game> gamesDiscarded;
+    public Deque<Game> gamesDiscarded  = new ArrayDeque<>();
+
+    @Override
+    public String toString() {
+        String playerName = (player != null) ? player.name : "Sense jugador";
+        String suitName = (suit != null) ? suit.name() : "Sense pal";
+
+        return "Card{" +
+                "id=" + id +
+                ", name='" + name + '\'' +
+                ", description='" + (description != null ? description : "") + '\'' +
+                ", suit=" + suitName +
+                ", player=" + playerName +
+                '}';
+    }
 
 }

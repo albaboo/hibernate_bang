@@ -1,6 +1,7 @@
 package hibernate.projects.Controller;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Deque;
 import java.util.HashSet;
@@ -14,6 +15,7 @@ import hibernate.projects.Entity.Player;
 import hibernate.projects.Entity.Role;
 import hibernate.projects.Entity.WeaponCard;
 import hibernate.projects.Enum.Suit;
+import hibernate.projects.Enum.TypeRole;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityTransaction;
 import jakarta.persistence.PersistenceException;
@@ -22,47 +24,88 @@ public class GameDAO {
 
     public static Set<Player> listPlayers(EntityManager em, int idGame) {
 
-        /** BLABLABLA */
-        return null;
+        Game game = em.find(Game.class, idGame);
+
+        return game.players != null ? game.players : new HashSet<>();
     }
 
     public static void showPlayers(EntityManager em, int idGame) {
-        Set<Player> players = new HashSet<Player>();
-        try {
-            players = listPlayers(em, idGame);
-            System.out.println("\n==================== LISTA DE JUGADORES ====================");
-            for (Player player : players) {
-                System.out.println("\t" + player.id + " - " + player.name);
-            }
-            System.out.println("============================================================");
-        } catch (PersistenceException e) {
-            System.err.println("\n\u001B[31mError durant la recuperació de dades: " + e.getMessage() + "\u001B[0m");
+        Set<Player> players = listPlayers(em, idGame);
+
+        System.out.println("\n==================== LISTA DE JUGADORES ====================");
+        for (Player player : players) {
+            System.out.println("\t" + player.id + " - " + player.name);
+        }
+        System.out.println("============================================================");
+
+    }
+
+    public static Game getGame(EntityManager em, int idGame) {
+
+        return em.find(Game.class, idGame);
+    }
+
+    public static void showGame(EntityManager em, int idGame) {
+
+        Game game = getGame(em, idGame);
+        if (game == null) {
+            System.out.println("\u001B[31mNo se ha encontrado ninguna partida con ID " + idGame + ".\u001B[0m");
+            return;
+        }
+        List<Player> rolesFound = new ArrayList<Player>();
+
+        System.out.println("\n==================== PARTIDA ====================");
+        System.out.println("Jugadores vivos:");
+
+        for (Player player : game.players) {
+            if (player.currentLife > 0) {
+
+                System.out.println("\t" + player.name + " (Vidas: " + player.currentLife + ")");
+
+                if (player.weapon != null) {
+                    System.out.println("\t\tArma:");
+                    System.out.println("\t\t\t" + player.weapon.name);
+                }
+
+                if (player.equipments.size() > 0) {
+                    System.out.println("\t\tEquipamiento:");
+                    for (Card card : player.equipments) {
+                        System.out.println("\t\t\t" + card.name);
+                    }
+                }
+
+                if (player.role.type == TypeRole.SHERIFF)
+                    rolesFound.add(player);
+            } else
+                rolesFound.add(player);
 
         }
+
+        System.out.println("Roles encontrados:");
+        for (Player player : rolesFound) {
+            System.out.println("\t" + player.role.type + " (" + player.name + ")");
+        }
+
+        System.out.println("=================================================");
+
     }
 
-    public static void showGame(int idGame) {
-        /**
-         * Show:
-         * Lives players & lives
-         * EquipmentCard of each player
-         * Roles found (Sheriff always)
-         */
-    }
+    public static Game startGame(EntityManager em, Scanner in) {
 
-    public static Game startGame(Scanner in, EntityManager em, EntityTransaction transaction) {
         Game game = new Game();
         game.players = new HashSet<>();
-        boolean building = true;
+        game.startDate = new Date();
+
+        EntityTransaction transaction = null;
 
         try {
             transaction = em.getTransaction();
             transaction.begin();
 
-            game.startDate = new Date();
             em.persist(game);
-            em.flush();
+            transaction.commit();
 
+            boolean building = true;
             while (building) {
                 System.out.println("\n==================== MENÚ DE PREPARACIÓN ====================");
                 System.out.println("\t1 - Añadir jugador a la partida");
@@ -72,14 +115,15 @@ public class GameDAO {
                     System.out.println("\t3 - Continuar");
                 System.out.println("=============================================================");
                 System.out.print("\nElige una número: ");
+                
                 int option = in.nextInt();
                 switch (option) {
                     case 1:
-                        addPlayer(in, em, transaction, game.id);
+                        game = addPlayer(in, em, game);
                         break;
 
                     case 2:
-                        removePlayer(in, em, transaction, game.id);
+                        game = removePlayer(in, em, game);
                         break;
 
                     case 3:
@@ -90,7 +134,6 @@ public class GameDAO {
                         break;
                 }
             }
-            transaction.commit();
 
             List<Role> roles = RoleDAO.list(em);
             int roleIndex = 0;
@@ -100,13 +143,10 @@ public class GameDAO {
 
             Deque<Card> cards = new ArrayDeque<>(CardDAO.shuffle(em));
 
-            transaction = em.getTransaction();
-            transaction.begin();
-
             for (Player player : game.players) {
                 player.role = roles.get(roleIndex % roles.size());
                 WeaponCard colt = new WeaponCard();
-                colt.name = "Colt";
+                colt.name = "COLT";
                 colt.description = "Arma predeterminada";
                 colt.distance = 1;
                 colt.suit = suits[suitIndex % suits.length];
@@ -114,37 +154,40 @@ public class GameDAO {
                 player.weapon = colt;
                 for (int i = 0; i < 4; i++) {
                     player.hand.add(cards.pollFirst());
-                    
+
                 }
-                
+
+                transaction = em.getTransaction();
+                transaction.begin();
+
                 em.persist(colt);
-                em.persist(player);
+                em.merge(player);
+                transaction.commit();
                 roleIndex++;
                 suitIndex++;
             }
 
+            transaction = em.getTransaction();
+            transaction.begin();
+
             game.playingCards = cards;
-
-            em.persist(game);
-
-            em.flush();
-
+            em.merge(game);
             transaction.commit();
 
         } catch (PersistenceException e) {
             if (transaction != null && transaction.isActive())
                 transaction.rollback();
-
-            System.err.println("\n\u001B[31mError durant la inserció de dades:  " + e.getMessage() + "\u001B[0m");
+            System.err.println("\n\u001B[31mError durante la inserción de datos: " + e.getMessage() + "\u001B[0m");
         }
         return game;
     }
 
-    private static Game addPlayer(Scanner in, EntityManager em, EntityTransaction transaction, int idGame) {
+    private static Game addPlayer(Scanner in, EntityManager em, Game game) {
+
         boolean selecting = true;
-        Game game = new Game();
+
         while (selecting) {
-            showPlayers(em, idGame);
+            showPlayers(em, game.id);
             System.out.println("\n\t0 - Volver atras");
             System.out.print("\nSelecciona un número de jugador: ");
             int option = in.nextInt();
@@ -157,28 +200,48 @@ public class GameDAO {
                 else if (game.players.contains(selectedPlayer))
                     System.err.println("\n\u001B[31mJugador ya incluido en la partida.\u001B[0m");
                 else {
-                    selectedPlayer.games.add(game);
-                    game.players.add(selectedPlayer);
+                    EntityTransaction transaction = em.getTransaction();
 
-                    System.out.println("Añadido: " + selectedPlayer.name);
-                    selecting = false;
+                    try {
+                        transaction.begin();
+                        selectedPlayer.games.add(game);
+                        game.players.add(selectedPlayer);
+
+                        em.merge(game);
+                        em.merge(selectedPlayer);
+
+                        transaction.commit();
+
+                        System.out.println("Añadido: " + selectedPlayer.name);
+                        selecting = false;
+
+                    } catch (Exception e) {
+                        if (transaction != null && transaction.isActive())
+                            transaction.rollback();
+
+                        System.err.println(
+                                "\n\u001B[31mError durante la adición de jugador: " + e.getMessage() + "\u001B[0m");
+                    }
+
                 }
 
             }
 
         }
+
         return game;
 
     }
 
-    private static Game removePlayer(Scanner in, EntityManager em, EntityTransaction transaction, int idGame) {
-        Game game = new Game();
+    private static Game removePlayer(Scanner in, EntityManager em, Game game) {
+
         boolean selecting = true;
         while (selecting) {
-            showPlayers(em, idGame);
+            showPlayers(em, game.id);
             System.out.println("\n\t0 - Volver atras");
             System.out.print("\nSelecciona un número de jugador: ");
             int option = in.nextInt();
+
             if (option == 0)
                 selecting = false;
             else {
@@ -188,11 +251,28 @@ public class GameDAO {
                 else if (!game.players.contains(selectedPlayer))
                     System.err.println("\n\u001B[31mJugador no incluido en la partida.\u001B[0m");
                 else {
-                    selectedPlayer.games.remove(game);
-                    game.players.remove(selectedPlayer);
+                    EntityTransaction transaction = em.getTransaction();
 
-                    System.out.println("Eliminado: " + selectedPlayer.name);
-                    selecting = false;
+                    try {
+
+                        transaction.begin();
+
+                        selectedPlayer.games.remove(game);
+                        game.players.remove(selectedPlayer);
+
+                        em.merge(game);
+                        em.merge(selectedPlayer);
+
+                        transaction.commit();
+
+                        System.out.println("Eliminado: " + selectedPlayer.name);
+                        selecting = false;
+                    } catch (Exception e) {
+                        if (transaction != null && transaction.isActive())
+                            transaction.rollback();
+                        System.err.println("\u001B[31mError al eliminar jugador: " + e.getMessage() + "\u001B[0m");
+                    }
+
                 }
 
             }
@@ -207,12 +287,40 @@ public class GameDAO {
         return false;
     }
 
-    public static Suit showCard(int idGame) {
-        /**
-         * BLABLABLA
-         */
+    public static Suit showCard(EntityManager em, int idGame) {
 
-        return null;
+        Game game = getGame(em, idGame);
+
+        if (game == null) {
+            System.out.println("\u001B[31mNo se ha encontrado la partida con ID " + idGame + ".\u001B[0m");
+            return null;
+        }
+
+        if (game.playingCards == null || game.playingCards.isEmpty()) {
+            System.out.println("\u001B[33mNo hay cartas disponibles para mostrar.\u001B[0m");
+            return null;
+        }
+
+        EntityTransaction transaction = em.getTransaction();
+
+        try {
+
+            transaction.begin();
+
+            Card card = game.playingCards.pollFirst();
+            game.discardedCards.addFirst(card);
+
+            em.merge(game);
+            transaction.commit();
+
+            return card.suit;
+        } catch (Exception e) {
+            if (transaction != null && transaction.isActive())
+                transaction.rollback();
+            System.err.println("\u001B[31mError al mostrar carta: " + e.getMessage() + "\u001B[0m");
+
+            return null;
+        }
+
     }
-
 }

@@ -2,6 +2,7 @@ package hibernate.projects.Controller;
 
 import java.util.Arrays;
 import java.util.List;
+
 import hibernate.projects.Entity.Card;
 import hibernate.projects.Entity.EquipmentCard;
 import hibernate.projects.Entity.UseCard;
@@ -28,14 +29,8 @@ public class CardDAO {
         return cards;
     }
 
-    public static List<Card> listByType(EntityManager em) {
-
-        List<Card> cards = em.createQuery("FROM Card", Card.class).getResultList();
-
-        return cards;
-    }
-
-    public static void checkCards(EntityManager em, EntityTransaction transaction) {
+    public static void checkCards(EntityManager em) {
+        EntityTransaction transaction = null;
         try {
             transaction = em.getTransaction();
             transaction.begin();
