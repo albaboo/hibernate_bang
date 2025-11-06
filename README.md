@@ -1,7 +1,9 @@
 # hibernate_bang
 
 Un proyecto en Java que simula el juego de mesa Bang! usando Hibernate y MySQL.  
-Desde la consola puedes añadir jugadores y jugar.
+Desde la consola puedes añadir jugadores y jugar.  
+
+More info [here](https://deepwiki.com/albaboo/hibernate_bang)
 
 ## 📋 Table of Contents
 
